@@ -34,6 +34,7 @@ rle_encode(pstring_type dst, pcstring_type src, std::size_t n, std::size_t min_r
     assert(min_run > 1);
 
     typedef typename std::iterator_traits<pcstring_type>::value_type char_type;
+    static_assert(std::is_unsigned<char_type>::value, "source string require unsigned char_type");
     std::size_t const max_run = std::numeric_limits<char_type>::max();
     auto dst_begin = dst;
 
