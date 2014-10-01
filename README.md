@@ -13,55 +13,32 @@ Quá trình nén được chia làm 4 bước, thao tác với mỗi block dung 
     4. Nén bằng mã Huffman (huffman coding)
 
 ### Biến đổi BWT
-Để sinh ra biến đổi BWT của xâu đầu vào, chương trình sử dụng thuật toán SA-IS
-để sinh ra Suffix Array, và từ suffix array đó tính ra được xâu biến đổi.
+Để sinh ra biến đổi BWT của xâu đầu vào, chương trình sử dụng thuật toán SA-IS để sinh ra Suffix Array, và từ suffix array đó tính ra được xâu biến đổi.
 
-Thuật toán SA-IS (Suffix Array - Induced Sorting) là một thuật toán dựa trên
-thuật toán KA. Có thời gian thực hiện là tuyến tính. Ý tưởng như sau:
-    - Suffix thứ `i` của xâu đầu vào `T` có thể chia làm hai loại là `S` và `L`
-    với: `Suf(T, i)` là `S` nếu `T[i:] < T[i+1:]`, `Suf(T, i)` là `L` nếu `T[i:] >
-    T[i+1:]`. Từ định nghĩa trên, `Suf(T, i)` là `S` nếu và chỉ nếu
-    `T[i] < T[i+1]` hoặc `T[i] = T[i+1]` và `Suf(T, i+1)` là `S`. Ta thấy nếu
-    hai suffix có cùng ký tự đâu, suffix loại `L` sẽ đứng trước suffix loại
-    `S`. Suffix cuối cùng `Suf(T, n-1)` được coi là loại `L`. Có thể xác định
-    loại của tất cả các suffix trong thời gian tuyến tính bằng cách duyệt ngược
-    từ cuối xâu.
-    - `Suf(T, i)` được gọi là `LMS` (Left-most S) nếu như `Suf(T, i) (i > 0)` là `S`
-      và `Suf(T, i-1)` là `L`. Suffix đầu tiên `Suf(T, 0)` không phải là `LMS`.
-      Ta thấy nếu như đã sắp xếp được các suffix
-      loại `LMS` thì cũng sẽ sẵp xếp được ngay suffix loại `L` ngay trước nó.
+Thuật toán SA-IS (Suffix Array - Induced Sorting) là một thuật toán dựa trên thuật toán KA. Có thời gian thực hiện là tuyến tính. Ý tưởng như sau:
+    
+   1. Suffix thứ `i` của xâu đầu và `T` có thể hia làm hai loại là `S` và `L`
+    với: `Suf(T, i)` là `S` nếu `T[i:] < T[i+1:]`, `Suf(T, i)` là `L` nếu `T[i:] > T[i+1:]`. 
+    Từ định nghĩa trên, `Suf(T, i)` là `S` nếu và chỉ nếu   `T[i] < T[i+1]` hoặc `T[i] = T[i+1]` và `Suf(T, i+1)` là `S`. Ta thấy nếu    hai suffix có cùng ký tự đâu, suffix loại `L` sẽ đứng trước suffix loại `S`. Suffix cuối cùng `Suf(T, n-1)` được coi là loại `L`. 
+    Có thể xác định loại của tất cả các suffix trong thời gian tuyến tính bằng cách duyệt ngược từ cuối xâu.
+
+   2. `Suf(T, i)` được gọi là `LMS` (Left-most S) nếu như `Suf(T, i) (i > 0)` là `S`      và `Suf(T, i-1)` là `L`. Suffix đầu tiên `Suf(T, 0)` không phải là `LMS`.
+      Ta thấy nếu như đã sắp xếp được các suffix      loại `LMS` thì cũng sẽ sắp xếp được ngay suffix loại `L` ngay trước nó.
       Từ đó sắp xếp được các suffix loại `S` còn lại. Quá trình này gọi là
       _induced sorting_.
-    - Để sẵp xếp các `LMS`, ta chia xâu đầu vào thành các `LMS substring`, mỗi
-      `LMS substring` là một xâu con bắt đầu và kết thúc đều là vị trí `LMS` và ở giũa
-      không có vị trí nào là `LMS` (với ngoại lệ là xâu con từ vị trí `LMS`
-      cuối cùng cho đến hết cũng được coi là một `LMS substring`). Thứ tự từ
-      điển của các `LMS substring` được quy định như sau: Nếu hai ký tự của
-      substring tại mỗi vị trí giống nhau thì so sánh kiểu (`L` hay `S`), kiểu `S` được coi là lớn hơn kiểu
-      `L`. Do suffix đầu tiên không phải là `LMS` và số `LMS` trong một xâu không vượt quá 1/2
-      độ dài xâu (do theo định nghĩa thì không có 2 `LMS` suffix liên tiếp
-      nhau) nến số lượng `LMS substring` không vượt quá 1/2 độ dài xâu.
-    - Các `LMS substring` có thể được sắp xếp (theo thứ tự từ điển) trong thời
-      gian tuyến tính bằng Induced Sorting: đầu tiên chia các `LMS suffix` vào
-      bucket tương ứng với ký tự đầu của nó, sau đó suy ra thứ tự của các `L`
-      suffix đứng trước mỗi `LMS suffix` (suffix `L` luôn đứng đầu bucket của
-      nó), cuối cùng là suy ra thứ tự của các suffix `S` (bao gồm cả các `LMS
-      suffix` ban đầu). Sau quá trình này, tất cả các `LMS Suffix` đều được
-      sắp xếp theo sao cho `LMS Substring` bắt đầu từ nó có thứ tự từ điển tăng
-      dần.
-    - Dựa vào kết quá của bước trên, các `LMS substring` được gán nhãn từ 0 dựa
-    theo thứ tự từ điển của nó trong thời gian tuyến tính, hai
-      `LMS substring` bằng nhau thì gán nhãn giống nhau. Thay các `LMS
-      substring` trong xâu gốc bằng nhãn của nó, và bỏ đi những phần còn lại
-      (phần không thuộc `LMS substring` nào), ta được xâu mới `T1` với độ dài
-      không vượt quá 1 nửa xâu `T`. Sau đó có thể áp dụng thuật toán 1 cách đệ
-      quy với xâu `T1` này để sẵp xếp các suffix loại `LMS`. Quá trình đệ quy
-      dừng lại khi không có hai `LMS substring` nào có nhãn giống nhau, khi đó
-      thì thứ tự của các `LMS suffix` đã được sắp xếp ở bước trước cũng chính là
-      thứ tự của các `LMS suffix` trong suffix array cần tìm.
+
+   3. Để sẵp xếp các `LMS`, ta chia xâu đầu vào thành các `LMS substring`, mỗi  `LMS substring` là một xâu con bắt đầu và kết thúc đều là vị trí `LMS` và ở giũa      không có vị trí nào là `LMS` (với ngoại lệ là xâu con từ vị trí `LMS`      cuối cùng cho đến hết cũng được coi là một `LMS substring`). 
+   Thứ tự từ   điển của các `LMS substring` được quy định như sau: Nếu hai ký tự của      substring tại mỗi vị trí giống nhau thì so sánh kiểu (`L` hay `S`), kiểu `S` được coi là lớn hơn kiểu      `L`. 
+   Do suffix đầu tiên không phải là `LMS` và số `LMS` trong một xâu không vượt quá 1/2      độ dài xâu (do theo định nghĩa thì không có 2 `LMS` suffix liên tiếp      nhau) nến số lượng `LMS substring` không vượt quá 1/2 độ dài xâu.
+
+   4. Các `LMS substring` có thể được sắp xếp (theo thứ tự từ điển) trong thời      gian tuyến tính bằng Induced Sorting: đầu tiên chia các `LMS suffix` vào      bucket tương ứng với ký tự đầu của nó, sau đó suy ra thứ tự của các `L` suffix đứng trước mỗi `LMS suffix` (suffix `L` luôn đứng đầu bucket của nó), cuối cùng là suy ra thứ tự của các suffix `S` (bao gồm cả các `LMS suffix` ban đầu). Sau quá trình này, tất cả các `LMS Suffix` đều được sắp xếp theo sao cho `LMS Substring` bắt đầu từ nó có thứ tự từ điển tăng dần.
+
+   5. Dựa vào kết quá của bước trên, các `LMS substring` được gán nhãn từ 0 dựa theo thứ tự từ điển của nó trong thời gian tuyến tính, hai
+      `LMS substring` bằng nhau thì gán nhãn giống nhau. Thay các `LMS substring` trong xâu gốc bằng nhãn của nó, và bỏ đi những phần còn lại  (phần không thuộc `LMS substring` nào), ta được xâu mới `T1` với độ dài  không vượt quá 1 nửa xâu `T`. 
+      Sau đó có thể áp dụng thuật toán 1 cách đệ  quy với xâu `T1` này để sẵp xếp các suffix loại `LMS`. Quá trình đệ quy dừng lại khi không có hai `LMS substring` nào có nhãn giống nhau, khi đó thì thứ tự của các `LMS suffix` đã được sắp xếp ở bước trước cũng chính là  thứ tự của các `LMS suffix` trong suffix array cần tìm.
 
 ### Run-length Encoding
-    Sau biến đổi MTF, chuỗi kết quả sẽ có nhiều byte liên tiếp giống nhau, do
+Sau biến đổi MTF, chuỗi kết quả sẽ có nhiều byte liên tiếp giống nhau, do
     đó có thể áp dụng RLE để làm giảm kích thước. Ở đây ta mã hóa RLE như sau:
     nếu một byte `b` được lặp lại nhiều hơn 1 lần thì được mã hóa thành `bbn`
     với n (kích thước 1 byte) là số lần lặp lại `b`, nếu chỉ xuất hiện 1 lần
