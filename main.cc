@@ -30,7 +30,7 @@
 enum Mode {COMPRESS, DECOMPRESS, INVALID};
 
 typedef std::int32_t index_type;
-static index_type min_run = 4;
+static index_type min_run = 3;
 static index_type huffman_wlength = 8;
 static index_type block_size = 900000;
 static index_type capacity = block_size * (min_run+1)/ min_run + 1;
