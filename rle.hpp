@@ -29,9 +29,9 @@ template<typename pstring_type, typename pcstring_type>
 std::size_t
 rle_encode(pstring_type dst, pcstring_type src, std::size_t n, std::size_t min_run=2)
 {
+    assert(min_run > 1);
     if (n == 0) return 0;
     if (n == 1) { dst[0] = src[0]; return 1; }
-    assert(min_run > 1);
 
     typedef typename std::iterator_traits<pcstring_type>::value_type char_type;
     static_assert(std::is_unsigned<char_type>::value, "source string require unsigned char_type");
@@ -48,7 +48,7 @@ rle_encode(pstring_type dst, pcstring_type src, std::size_t n, std::size_t min_r
             // run
             std::size_t run = 2;
             while ( (src != s_end) && ((c0 = *src++) == c1) ) ++run;
-            while (run > min_run-1) {
+            while (run >= max_run) {
                 std::fill_n(dst, min_run, c1);
                 dst += min_run;
                 *dst++ = std::min(run, max_run);
@@ -57,6 +57,8 @@ rle_encode(pstring_type dst, pcstring_type src, std::size_t n, std::size_t min_r
             if (run > 0) {
                 std::fill_n(dst, run, c1);
                 dst += run;
+                if (run >= min_run)
+                    *dst++ = run;
             }
             end_at_run = (src == s_end) && (c0 == c1);
         } else {
@@ -73,9 +75,9 @@ template<typename pstring_type, typename pcstring_type>
 std::size_t
 rle_decode(pstring_type dst, pcstring_type src, std::size_t n, std::size_t min_run=2)
 {
+    assert(min_run > 1);
     if (n == 0) return 0;
     if (n == 1) { dst[0] = src[0]; return 1; }
-    assert(min_run > 1);
 
     typedef typename std::iterator_traits<pcstring_type>::value_type char_type;
     static_assert(std::is_unsigned<char_type>::value, "source string require unsigned char_type");
