@@ -56,7 +56,8 @@ compress_test(){
     csz=$(stat --printf "%s" "$cfile")
     ratio=$(echo "$csz / $sz" | bc -l)
     ratio=$(printf "%.03f" $ratio)
-    printf " %-8s | %-09s | %-13s |" $hcsz $ratio "$ctime"s
+    #printf " %-8s | %-09s | %-13s |" $hcsz $ratio "$ctime"s
+    printf " %-8s | %-09s | %-13s |" $csz $ratio "$ctime"s
 
     if [[ $prog = "tar" ]]; then
         xtime=$(/usr/bin/time -f "%e" "$prog" "$xopt" "$cfile" -C "$TMP" 2>&1 >/dev/null)
@@ -86,8 +87,10 @@ mkdir -p "$TMP" &> /dev/null
 for file in "$@"
 do
     filename=$(basename "$file")
-    hsz=$(/bin/ls -lh "$file" | cut -d" " -f5)iB
-    printf "| %-15s | %-10s |" "$filename" $hsz
+    #hsz=$(/bin/ls -lh "$file" | cut -d" " -f5)iB
+    sz=$(stat --printf "%s" "$file")
+    #printf "| %-15s | %-10s |" "$filename" $hsz
+    printf "| %-15s | %-10s |" "$filename" $sz
 
     ## BWT + MTF + RLE + HM
     algo="BWT+MTF+RLE+HM"
