@@ -73,7 +73,7 @@ sau:
 
 Giải nén file nén trên thành file `filename.ex`, ta sử dụng lệnh:
 
-    ./ac x filename.ex filename.bwt
+    ./bwt x filename.ex filename.bwt
 
 Để nén dữ liệu thời gian thực (từ đầu vào chuẩn `stdin`), ta sử dụng `-` thay
 cho tên file đầu vào. VD: nén thư mục hiện tại, kết hợp với `tar`:
@@ -96,6 +96,7 @@ Chương trình được chạy thử trên máy tính với CPU Intel Pentium B
 
 Bảng kết quả sau đầy là kết quả của chạy 4 thuật toán với cùng tập file đầu
 vào:
+
 1. BWT+MTF+RLE+Huffman
 2. gzip
 3. bzip2
