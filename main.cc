@@ -31,8 +31,9 @@ enum Mode {COMPRESS, DECOMPRESS, INVALID};
 
 typedef std::int32_t index_type;
 static index_type min_run = 3;
-static index_type huffman_wlength = 8;
+static index_type huffman_wlength = 16;
 static index_type block_size = 900000;
+static index_type hm_threshold = 200000;
 static index_type capacity = block_size * 2; //(min_run+1)/ min_run + 1;
 static index_type alphabet_size = 256;
 
@@ -46,6 +47,9 @@ void encode(std::ostream& os, std::istream &is)
         is.read((char*)s1, block_size);
         index_type reed = is.gcount();
         if (reed == 0) break;
+
+        if (reed < hm_threshold) huffman_wlength = 8;
+        else huffman_wlength = 16;
 
         // pass1: bwt -> s2 = bwt
 //        index_type pidx;
